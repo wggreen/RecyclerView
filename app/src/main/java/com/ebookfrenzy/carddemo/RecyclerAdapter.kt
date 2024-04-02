@@ -1,12 +1,13 @@
 package com.ebookfrenzy.carddemo
 
+import android.content.Intent
 import android.view.LayoutInflater
-import android.widget.ImageView
-import android.widget.TextView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
+import kotlin.coroutines.coroutineContext
 import kotlin.random.Random
 
 class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
@@ -18,15 +19,25 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
         var itemTitle: TextView
         var itemDetail: TextView
 
+        val randomIndexTitle = Random.nextInt(data.titles.size)
+        val randomIndexDetail = Random.nextInt(data.details.size)
+        val randomIndexImage = Random.nextInt(data.images.size)
+
         init {
             itemImage = itemView.findViewById(R.id.itemImage)
             itemTitle = itemView.findViewById(R.id.itemTitle)
             itemDetail = itemView.findViewById(R.id.itemDetail)
 
             itemView.setOnClickListener { v: View ->
-                val position: Int = adapterPosition
-                Snackbar.make(v, "Click detected on item $position",
-                    Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                val i = Intent(v.getContext(),SecondActivity::class.java)
+
+                i.putExtra("image", data.images[randomIndexImage])
+                i.putExtra("title", itemTitle.text.toString())
+                i.putExtra("detail", itemDetail.text.toString())
+
+                val context = v.context
+
+                context.startActivity(i)
             }
         }
     }
@@ -38,13 +49,10 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, i: Int) {
-        val randomIndexTitle = Random.nextInt(data.titles.size)
-        val randomIndexDetail = Random.nextInt(data.details.size)
-        val randomIndexImage = Random.nextInt(data.images.size)
 
-        viewHolder.itemTitle.text = data.titles[randomIndexTitle]
-        viewHolder.itemDetail.text = data.details[randomIndexDetail]
-        viewHolder.itemImage.setImageResource(data.images[randomIndexImage])
+        viewHolder.itemTitle.text = data.titles[viewHolder.randomIndexTitle]
+        viewHolder.itemDetail.text = data.details[viewHolder.randomIndexDetail]
+        viewHolder.itemImage.setImageResource(data.images[viewHolder.randomIndexImage])
     }
 
     override fun getItemCount(): Int {
